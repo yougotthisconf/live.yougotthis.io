@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You Got This Live!</title>
+    <meta name="description" content="You Got This! is a learning hub focused on core skills needed for a happy and healthy work life.">
+    <meta property="og:url" content="https://live.yougotthis.io">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="You Got This Live!">
+    <meta property="og:description" content="You Got This! is a learning hub focused on core skills needed for a happy and healthy work life.">
+    <meta property="og:image" content="https://yougotthis.io/img/brand/open-graph.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="live.yougotthis.io">
+    <meta property="twitter:url" content="https://live.yougotthis.io">
+    <meta name="twitter:title" content="You Got This Live!">
+    <meta name="twitter:description" content="You Got This! is a learning hub focused on core skills needed for a happy and healthy work life.">
+    <link data-n-head="ssr" rel="shortcut icon" href="https://yougotthis.io/icons/favicon.ico">
+    <link data-n-head="ssr" rel="apple-touch-icon" sizes="180x180" href="https://yougotthis.io/icons/apple-touch-icon.png">
+    <link data-n-head="ssr" rel="icon" sizes="32x32" type="image/png" href="https://yougotthis.io/icons/favicon-32x32.png">
+    <link data-n-head="ssr" rel="icon" sizes="16x16" type="image/png" href="https://yougotthis.io/icons/favicon-16x16.png">
+    <meta name="twitter:image" content="https://yougotthis.io/img/brand/open-graph.png">
+    <script defer src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['var(--font)', 'sans-serif'] }}} }</script>
+    <style id="inject"></style>
+</head>
+<body class="bg-[var(--page-background)]">
+    <div id="app">
+        <div v-if="!meta" class="w-full flex justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" stroke="#000" class="mt-12 w-12"><g fill="none" fill-rule="evenodd" stroke-width="2"><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="0s" calcMode="spline" dur="1.8s" keySplines="0.165, 0.84, 0.44, 1" keyTimes="0; 1" repeatCount="indefinite" values="1; 20"/><animate attributeName="stroke-opacity" begin="0s" calcMode="spline" dur="1.8s" keySplines="0.3, 0.61, 0.355, 1" keyTimes="0; 1" repeatCount="indefinite" values="1; 0"/></circle><circle cx="22" cy="22" r="1"><animate attributeName="r" begin="-0.9s" calcMode="spline" dur="1.8s" keySplines="0.165, 0.84, 0.44, 1" keyTimes="0; 1" repeatCount="indefinite" values="1; 20"/><animate attributeName="stroke-opacity" begin="-0.9s" calcMode="spline" dur="1.8s" keySplines="0.3, 0.61, 0.355, 1" keyTimes="0; 1" repeatCount="indefinite" values="1; 0"/></circle></g></svg>
+        </div>
+        <div v-else class="h-screen flex flex-col">
+            <header class="bg-[var(--header-background)] text-[var(--header-text)] p-3 lg:flex justify-between items-center">
+                <a :href="meta.nav_logo_url">
+                    <img :src="`https://${directus}/assets/${meta.nav_logo.id}?height=50`" :alt="meta.nav_logo.description">
+                </a>
+                <ul class="mt-4 lg:mt-0 lg:flex mr-3 gap-6 text-lg">
+                    <li v-for="link of meta.nav"><a :href="link.url">{{ link.text }}</a></li>
+                </ul>
+            </header>
+
+            <div v-if="meta && meta.status == 'live'" id="live" class="grid w-full 2xl:grid-cols-[auto_400px] gap-4 2xl:flex-1 p-4">
+                <section id="video" class="relative aspect-video 2xl:aspect-auto">
+                    <mux-player stream-type="live" :playback-id="meta.mux_playback_id" controls class="w-full 2xl:h-full 2xl:absolute aspect-video" />
+                </section>
+                <aside class="flex flex-col gap-4 ">
+                    <div id="chat" class="flex-1 bg-white border p-4 rounded shadow-sm min-h-[500px]">
+
+                        <!-- Set Username -->
+                        <div v-if="!chat.user" class="h-full flex flex-col justify-end items-start">
+                            <form @submit.prevent="setUser" class="mt-2 border-t pt-2 bg-white">
+                                <label for="name" class="block font-medium text-gray-700 mb-2">To view and participate in the event chat, please provide a display name.</label>
+                                <input v-model="chat.newUser" type="text" name="name" id="name" aria-label="Username" placeholder="Joe Bloggs" class="block w-full rounded-md border-gray-300 pr-10 focus:border-[var(--form-focus)] focus:ring-[var(--form-focus)] sm:text-sm">
+                            </form>
+                            <span class="text-sm mt-2">By using chat, you agree to the <a href="https://yougotthis.io/conduct" class="underline">Code of Conduct</a>.</span>
+                        </div>
+
+                        <!-- Chat -->
+                        <div v-else="chat.user" class="flex flex-col justify-end items-start h-full">
+                            <ol ref="messages" class="mb-auto w-full flex-auto overflow-y-auto h-0">
+                                <li v-for="item in chat.messages" class="mb-3">
+                                    <small>{{ item.user }}</small>
+                                    <p>{{ item.message }}</p>
+                                </li>
+                            </ol>
+                            <form @submit.prevent="sendMessage" class="border-t pt-2 bg-white w-full">
+                                <label for="message" class="block font-medium text-gray-700 mb-2">Message</label>
+                                <input v-model="chat.newMessage" type="text" name="message" id="message" aria-label="Message" class="block w-full rounded-md border-gray-300 pr-10 focus:border-[var(--form-focus)] focus:ring-[var(--form-focus)] sm:text-sm">
+                            </form>
+                            <button @click="clearUser" class="underline text-sm mt-2">Logout as {{ chat.user }}</button>
+                        </div>
+                    </div>
+
+                    <div id="sponsors" v-if="meta.events.sponsors.length > 0" class="flex-shrink bg-white border p-4 rounded shadow-sm">
+                        <div class="grid grid-cols-2 lg:grid-cols-4 2xl:grid-cols-2 gap-4">
+                            <a v-for="sponsor in meta.events.sponsors" :href="sponsor.sponsors_slug.url">
+                                <img :src="`https://${directus}/assets/${sponsor.sponsors_slug.file}?width=400`" :alt="sponsor.sponsors_slug.title" class="block w-full">
+                            </a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            
+            <div v-if="meta && meta.status != 'live'" class="text-center mt-12">
+                <p class="text-4xl font-bold">{{ meta.off_air_text }}</p>
+                <a :href="`${eventPath}/${meta.events.slug}`" class="underline mt-4 block">Go to {{ meta.events.title }} event page.</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+    import { createApp, nextTick } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js'
+    
+    createApp({
+        async created() {
+            this.meta = (await fetch(`https://${this.directus}/items/live?fields=*,*.*,*.sponsors.sponsors_slug.*`).then(r => r.json())).data
+            document.querySelector('style#inject').innerHTML = this.meta.css
+            if(this.meta.status == 'live') this.createMuxPlayerTag()
+
+            this.connection = new WebSocket(`wss://${this.directus}/websocket`)
+            this.connection.onopen = () => { this.connection.send(JSON.stringify({ type: 'auth', access_token: this.public_token })) }
+            this.connection.onmessage = message => this.handleMessage(message)
+
+            const user = localStorage.getItem('user')
+            if(user) this.chat.user = user
+        },
+        data() {
+            return {
+                eventPath: 'https://yougotthis.io/events',
+                directus: 'yougotthisconf.directus.app',
+                public_token: '4VfPChMr0EzeniC9flkm2ZLWtQX6Pg14',
+                meta: null,
+                connection: null,
+                chat: {
+                    newUser: '',
+                    user: null,
+                    messages: [],
+                    newMessage: ''
+                }
+            }
+        },
+        methods: {
+            createMuxPlayerTag() {
+                const scriptTag = document.createElement('script')
+                scriptTag.src = 'https://unpkg.com/@mux/mux-player'
+                scriptTag.setAttribute('id', 'mux')
+                scriptTag.setAttribute('charset', 'utf-8')
+                document.head.appendChild(scriptTag)
+            },
+            destroyMuxPlayerTag() {
+                document.getElementById('mux').remove()
+            },
+            handleMessage(message) {
+                const data = JSON.parse(message.data)
+                if(data.type == 'ping') {
+                    this.send({ type: 'pong '})
+                }
+                if(data.type == 'auth' && data.status == 'ok') {
+                    this.send({ type: 'subscribe', collection: 'live', uid: 'meta', query: { fields: ['*', '*.*', '*.sponsors.sponsors_slug.*'] }})
+                    this.send({ type: 'subscribe', collection: 'messages', uid: 'chat', query: { sort: 'date_created' } })
+                }
+                if(data.type == 'subscription' && data.uid == 'meta' && data.event == 'update') {
+                    this.meta = data.data[0]
+                    if(this.meta.status == 'live') this.createMuxPlayerTag()
+                    if(this.meta.status != 'live') this.destroyMuxPlayerTag()
+                }
+                if(data.type == 'subscription' && data.uid == 'chat' && data.event == 'init') {
+                    this.chat.messages = data.data
+                    this.scrollToBottom()
+                }
+                if(data.type == 'subscription' && data.uid == 'chat' && data.event == 'create') {
+                    this.chat.messages = [...this.chat.messages, ...data.data]
+                    this.scrollToBottom()
+                }
+                if(data.type == 'subscription' && data.uid == 'chat' && data.event == 'delete') {
+                    for(let item of data.data) {
+                        this.chat.messages = this.chat.messages.filter(c => c.id != item)
+                    }
+                }
+            },
+            sendMessage() {
+                this.send({ type: 'items', collection: 'messages', action: 'create', data: { message: this.chat.newMessage, user: this.chat.user } })
+                this.chat.newMessage = ''
+            },
+            setUser() {
+                this.chat.user = this.chat.newUser
+                localStorage.setItem('user', this.chat.user)
+                setTimeout(this.scrollToBottom, 250)
+            },
+            clearUser() {
+                this.chat.user = null
+                localStorage.removeItem('user')
+            },
+            send(obj) { this.connection.send(JSON.stringify(obj)) },
+            scrollToBottom() {
+                const m = this.$refs.messages
+                nextTick(() => m.scrollTop = m.scrollHeight)
+            }
+        }
+    }).mount('#app')
+    </script>
+    <script async defer src="https://uatu.yougotthis.io/latest.js"></script>
+    <noscript><img src="https://uatu.yougotthis.io/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript> 
+</body>
+</html>
