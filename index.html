@@ -82,7 +82,7 @@
                 </aside>
             </div>
             
-            <div v-if="meta && meta.status != 'live'" class="text-center mt-12">
+            <div v-if="meta && meta.status != 'live'" class="text-center mt-12 p-4">
                 <p class="text-4xl font-bold">{{ meta.off_air_text }}</p>
                 <a :href="`${eventPath}/${meta.events.slug}`" class="underline mt-4 block">Go to {{ meta.events.title }} event page.</a>
             </div>
