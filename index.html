@@ -48,7 +48,7 @@
                     <div id="chat" class="flex-1 bg-white border p-4 rounded shadow-sm min-h-[500px]">
 
                         <!-- Set Username -->
-                        <div v-if="!chat.user" class="h-full flex flex-col justify-end items-start">
+                        <div v-if="!chat.user" class="h-full flex flex-col justify-end">
                             <form @submit.prevent="setUser" class="mt-2 border-t pt-2 bg-white">
                                 <label for="name" class="block font-medium text-gray-700 mb-2">To view and participate in the event chat, please provide a display name.</label>
                                 <input v-model="chat.newUser" type="text" name="name" id="name" aria-label="Username" placeholder="Joe Bloggs" class="block w-full rounded-md border-gray-300 pr-10 focus:border-[var(--form-focus)] focus:ring-[var(--form-focus)] sm:text-sm">
