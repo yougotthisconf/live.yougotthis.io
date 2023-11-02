@@ -33,7 +33,7 @@
         <div v-else class="h-screen flex flex-col">
             <header class="bg-[var(--header-background)] text-[var(--header-text)] p-3 lg:flex justify-between items-center">
                 <a :href="meta.nav_logo_url">
-                    <img :src="`https://${directus}/assets/${meta.nav_logo.id}?height=50`" :alt="meta.nav_logo.description">
+                    <img :src="`https://${directus}/assets/${meta.nav_logo.id}?height=100`" :alt="meta.nav_logo.description" class="h-[50px]">
                 </a>
                 <ul class="mt-4 lg:mt-0 lg:flex mr-3 gap-6 text-lg">
                     <li v-for="link of meta.nav"><a :href="link.url">{{ link.text }}</a></li>
